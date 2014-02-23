@@ -62,6 +62,14 @@ function getcoredomains {
     fi
 }
 
+# Compares two version strings
+#
+# vercomp VERSION1 VERSION2
+#
+# returns
+# 0: VERSION1 equals VERSION2
+# 1: VERSION1 is greater than VERSION2
+# 2: VERSION1 is lower than VERSION2
 function vercomp {
     if [[ $1 == $2 ]]; then
         return 0
@@ -85,6 +93,32 @@ function vercomp {
         fi
     done
     return 0
+}
+
+# Checks the version status in comparison to the minimal
+# required version and the current version.
+#
+# verstatus VERSION MINVER CURVER
+#
+# returns
+# 0: OK (version equals or is greater than current version)
+# 1: WARNING (version is greater than minimal version but not >= current version)
+# 2: CRITICAL (version is lower than minimal version)
+function verstatus {
+    vercomp $1 $3;
+    if [[ $? == 2 ]]; then
+        vercomp $1 $2
+        if [[ $? == 2 ]]; then
+            # CRITICAL
+            return 2
+        else
+            # WARNING
+            return 1
+        fi
+    else
+        # OK
+        return 0
+    fi
 }
 
 function init {
@@ -225,6 +259,10 @@ function printresult {
     curver=$(echo "$1" | cut -d ';' -f4)
     insver="$2"
 
+    # Get version status (0=OK, 1=WARNING, 2=CRITICAL)
+    verstatus $2 $minver $curver
+    status=$?
+
     if [[ ! $csvformat ]]; then
         #Add tabs based on program name size
         if [[ $(echo "$program" | wc -c) -lt 9 ]]; then
@@ -239,6 +277,13 @@ function printresult {
         else
             insver="$insver\t"
         fi
+        
+        #Add tabs based on version name size
+        if [[ $(echo "$curver" | wc -c) -lt 9 ]]; then
+            curver="$curver\t\t"
+        else
+            curver="$curver\t"
+        fi
     fi
 
     if [[ ! $2 ]]; then
@@ -252,32 +297,32 @@ function printresult {
             if [[ $? == 2 ]]; then
                 vercomp $2 $minver
                 if [ $? == 2 ]; then
-                    echo -e "$program\e[0;31m$insver\e[0m$3"
+                    echo -e "$program\e[0;31m$insver\e[0m$curver$3"
                 else
-                    echo -e "$program\e[0;33m$insver\e[0m$3"
+                    echo -e "$program\e[0;33m$insver\e[0m$curver$3"
                 fi
             else
                 if [[ ! $showonlyold ]]; then
-                    echo -e "$program\e[0;32m$insver\e[0m$3"
+                    echo -e "$program\e[0;32m$insver\e[0m$curver$3"
                 fi
             fi
         else
             vercomp $2 $curver
             if [[ $? == 2 ]]; then
-                echo -e "$program$insver$3"
+                echo -e "$program$insver$curver$3"
             else
                 if [[ ! $showonlyold ]]; then
-                    echo -e "$program$insver$3"
+                    echo -e "$program$insver$curver$3"
                 fi
             fi
         fi
     else
         vercomp $2 $curver
         if [[ $? == 2 ]]; then
-            echo "$program,$insver,$3"
+            echo "$program,$insver,$curver,$status,$3"
         else
             if [[ ! $showonlyold ]]; then
-                echo "$program,$insver,$3"
+                echo "$program,$insver,$curver,$status,$3"
             fi
         fi
     fi
