@@ -6,21 +6,21 @@ A webapplication scanner that detects all outdated webapps on a server.
 
 This script scans the user directories and reports the installed CMS packages and what version it is running. It can be set to report just outdated packages and scan specific users. It has the ability to search for common versions of the following packages:
 
-- WordPress
-- Typo3
-- Joomla
-- Drupal
-- e107
-- Mambo
-- Mediawiki
-- OpenX
-- osCommerce2
-- phpBB3
-- Piwigo
-- Redmine
-- X-Cart
-- XOOPS
-- ZenCart
+- [WordPress](http://wordpress.org/)
+- [Typo3](http://typo3.org/)
+- [Joomla](http://www.joomla.org/)
+- [Drupal](https://drupal.org)
+- [e107](http://e107.org/)
+- [Mambo](http://www.mamboserver.com/)
+- [MediaWiki](http://www.mediawiki.org)
+- [OpenX](http://openx.com/)
+- [osCommerce2](http://www.oscommerce.com/)
+- [phpBB3](https://www.phpbb.com/)
+- [Piwigo](http://piwigo.org/)
+- [Redmine](http://www.redmine.org/)
+- [X-Cart](http://www.x-cart.com/)
+- [XOOPS](http://www.xoops.org/)
+- [ZenCart](https://www.zen-cart.com/)
 
 Additional packages can be added by adding a function with the signature to identify the package.
 
