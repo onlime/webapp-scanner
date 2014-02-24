@@ -1,10 +1,16 @@
 #!/bin/bash
-# Software Version finder by James Dooley
+# 
+# Webapp Scanner by Onlime Webhosting, http://www.onlime.ch
 # Locates common web programs on a server and checks the version to see if it is up to date
+#
+# based on / credits to:
+# Software Version finder by James Dooley
+# http://g33kinfo.com/info/archives/5981
+#
 
-#This should not need to be updated
-#Format is function;Display Name;Minimum Version;Current Version
-#Do note that there can not be spaces in the ID strings.
+# Signature scanning configuration (This should not need to be updated)
+# Format is function;Display_Name;Minimum_Version;Current_Version
+# Do note that there can not be spaces in the ID strings.
 scans=""
 scans="$scans typo3_45;Typo3_4.5;4.5;4.5.30"
 scans="$scans typo3_47;Typo3_4.7;4.7;4.7.17"
@@ -15,24 +21,25 @@ scans="$scans drupal7;Drupal7;7;7.26"
 scans="$scans drupal6;Drupal6;6;6.30"
 # e107 2.0.0 is alpha not adding until released
 scans="$scans e107;e107;1;1.0.4"
-scans="$scans joomla15;Joomla_1.5;1.5;1.5.999" # EOL; No longer offered on site
+scans="$scans joomla15;Joomla_1.5;1.5;1.5.999"     # EOL; No longer offered on site
 scans="$scans joomla17;Joomla_1.7;1.7.999;1.7.999" # EOL; No longer offered on site
-scans="$scans joomla25;Joomla_2.5;2.5;2.5.17"
-scans="$scans joomla32;Joomla_3.2;3.2;3.2.1"
+scans="$scans joomla25;Joomla_2.5;2.5;2.5.18"
+scans="$scans joomla32;Joomla_3.2;3.2;3.2.2"
 scans="$scans mambo;Mambo_CMS;4.6;4.6.5"
-scans="$scans mediawiki;MediaWiki;1.22;1.22.1"
+scans="$scans mediawiki;MediaWiki;1.22;1.22.2"
 scans="$scans openx;OpenX/Revive;3.0;3.0.2"
 scans="$scans oscommerce2;osCommerce2;2.3;2.3.3.4"
 scans="$scans phpbb3;phpBB3;3.0;3.0.12"
 scans="$scans piwigo;Piwigo;2.6;2.6.1"
 scans="$scans redmine2_3;Redmine_2.3;2.3;2.3.4"
-scans="$scans redmine2_4;Redmine_2.4;2.4;2.4.2"
+scans="$scans redmine2_4;Redmine_2.4;2.4;2.4.3"
 # vBull has 3.8 and 5.0 lines, due to closed source I am not able to create signatures
 scans="$scans vbulletin4;vBulletin_4;4.2;4.2.2"
 scans="$scans wordpress;WordPress;3.8;3.8.1"
-scans="$scans xcart;X-Cart;5.0;5.0.10"
+scans="$scans xcart;X-Cart;5.0;5.0.11"
 scans="$scans xoops;XOOPS;2.5;2.5.6"
 scans="$scans zencart;ZenCart;1.5;1.5.1"
+
 
 function getcpanelusers {
     cpanelusers=$(/bin/ls -A1 /var/cpanel/users/)
@@ -278,6 +285,14 @@ function printresult {
     minver=$(echo "$1" | cut -d ';' -f3)
     curver=$(echo "$1" | cut -d ';' -f4)
     insver="$2"
+    
+    # Compare version with current version
+    vercomp $2 $curver
+    vercompCur=$?
+    
+    # Compare version with minimal version
+    vercomp $2 $minver
+    vercompMin=$?
 
     # Get version status (0=OK, 1=WARNING, 2=CRITICAL)
     verstatus $2 $minver $curver
@@ -306,17 +321,16 @@ function printresult {
         fi
     fi
 
-    if [[ ! $2 ]]; then
-        echo -e "$program ===Signature match but no version returned === $3"
-        return
-    fi
-
     if [[ ! $csvformat ]]; then
+        # break here if no version found
+        if [[ ! $2 ]]; then
+            echo -e "$program ===Signature match but no version returned === $3"
+            return
+        fi
+
         if [[ ! $reportonly ]]; then
-            vercomp $2 $curver;
-            if [[ $? -eq 2 ]]; then
-                vercomp $2 $minver
-                if [ $? -eq 2 ]; then
+            if [[ $vercompCur -eq 2 ]]; then
+                if [ $vercompMin -eq 2 ]; then
                     echo -e "$program\e[0;31m$insver\e[0m$curver$3"
                 else
                     echo -e "$program\e[0;33m$insver\e[0m$curver$3"
@@ -327,8 +341,7 @@ function printresult {
                 fi
             fi
         else
-            vercomp $2 $curver
-            if [[ $? -eq 2 ]]; then
+            if [[ $vercompCur -eq 2 ]]; then
                 echo -e "$program$insver$curver$3"
             else
                 if [[ ! $showonlyold ]]; then
@@ -337,8 +350,7 @@ function printresult {
             fi
         fi
     else
-        vercomp $2 $curver
-        if [[ $? -eq 2 ]]; then
+        if [[ $vercompCur -eq 2 ]]; then
             echo "$program,$insver,$curver,$status,$3"
         else
             if [[ ! $showonlyold ]]; then
@@ -379,19 +391,16 @@ function wordpress {
     done
 }
 
+# Scan for Typo3 installs
+# TODO: This should only be called once and used for all typo3_* functions
+# Problem: All signature functions are called in a subshell
 function typo3_scan {
-    if [ -z $t3Searched ]; then
-        echo "now scanning for T3 in $1 ..."
-        t3Installations=""
-        find $1 -type f -name 'config_default.php' -wholename '**/t3lib/config_default.php' -print0 | while read -d '' -r F; do
-            D=`dirname "$F"`
-            D=`dirname "$D"`
-            VERSION=`grep -e '^\s*\$TYPO_VERSION' "$F" | sed -r "s/^.*=\s*'(.*)'.*$/\1/g"`
-            t3Installations="$t3Installations $D;$VERSION"
-        done
-        t3Searched=1
-    fi
-    echo $t3Installations
+    find $1 -type f -name 'config_default.php' -wholename '**/t3lib/config_default.php' -print0 | while read -d '' -r F; do
+        D=`dirname "$F"`
+        D=`dirname "$D"`
+        VERSION=`grep -e '^\s*\$TYPO_VERSION' "$F" | sed -r "s/^.*=\s*'(.*)'.*$/\1/g"`
+        echo "$D;$VERSION"
+    done
 }
 
 function typo3_45 {
@@ -705,18 +714,20 @@ until [[ -z $1 ]]; do
         --help)
             echo "Usage: $0 [OPTION] [--user username]"
             echo "Scan server for known CMS versions and report what is found"
+            echo ""
+            echo "OPTIONS:"
             echo " --outdated"
-            echo "  Returns only outdated packages, does not print headings"
+            echo "    Returns only outdated packages, does not print headings"
             echo " --report"
-            echo "  Removes coloring format for easy export to file using > filename"
+            echo "    Removes coloring format for easy export to file using > filename"
             echo " --csv"
-            echo "  Prints output in CSV format."
+            echo "    Prints output in CSV format."
             echo " --user <username>"
-            echo "  Scans only user's account, use quotes for a providing a list of users"
+            echo "    Scans only user's account, use quotes for a providing a list of users"
             echo " --directory <directory>"
-            echo "  Scans only a specific directory, used quotes for providing a list of directories"
+            echo "    Scans only a specific directory, used quotes for providing a list of directories"
             echo " --sigs"
-            echo "  Print current list of program versions"
+            echo "    Print current list of program versions"
             exit 1
             ;;
         *)
