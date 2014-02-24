@@ -6,6 +6,11 @@
 #Format is function;Display Name;Minimum Version;Current Version
 #Do note that there can not be spaces in the ID strings.
 scans=""
+scans="$scans typo3_45;Typo3_4.5;4.5;4.5.30"
+scans="$scans typo3_47;Typo3_4.7;4.7;4.7.17"
+scans="$scans typo3_60;Typo3_6.0;6.0;6.0.12"
+scans="$scans typo3_61;Typo3_6.1;6.1;6.1.7"
+scans="$scans typo3_62;Typo3_6.2;6.2;6.2.0"
 scans="$scans drupal7;Drupal7;7;7.26"
 scans="$scans drupal6;Drupal6;6;6.30"
 # e107 2.0.0 is alpha not adding until released
@@ -369,6 +374,76 @@ function wordpress {
     for loc in ${idfiles}; do
         if [[ -e "$loc/wp-includes/version.php" ]]; then
             insver=$(grep "wp_version =" $loc/wp-includes/version.php | cut -d "'" -f2)
+            printresult $2 "$insver" "$loc"
+        fi
+    done
+}
+
+function typo3_scan {
+    if [ -z $t3Searched ]; then
+        echo "now scanning for T3 in $1 ..."
+        t3Installations=""
+        find $1 -type f -name 'config_default.php' -wholename '**/t3lib/config_default.php' -print0 | while read -d '' -r F; do
+            D=`dirname "$F"`
+            D=`dirname "$D"`
+            VERSION=`grep -e '^\s*\$TYPO_VERSION' "$F" | sed -r "s/^.*=\s*'(.*)'.*$/\1/g"`
+            t3Installations="$t3Installations $D;$VERSION"
+        done
+        t3Searched=1
+    fi
+    echo $t3Installations
+}
+
+function typo3_45 {
+    t3Scans="$(typo3_scan $1)"
+    for scan in ${t3Scans}; do
+        loc=$(echo "$scan" | cut -d ";" -f1)
+        insver=$(echo "$scan" | cut -d ";" -f2)
+        if [[ $insver == 4.5.* ]]; then
+            printresult $2 "$insver" "$loc"
+        fi
+    done
+}
+
+function typo3_47 {
+    t3Scans="$(typo3_scan $1)"
+    for scan in ${t3Scans}; do
+        loc=$(echo "$scan" | cut -d ";" -f1)
+        insver=$(echo "$scan" | cut -d ";" -f2)
+        if [[ $insver == 4.7.* ]]; then
+            printresult $2 "$insver" "$loc"
+        fi
+    done
+}
+
+function typo3_60 {
+    t3Scans="$(typo3_scan $1)"
+    for scan in ${t3Scans}; do
+        loc=$(echo "$scan" | cut -d ";" -f1)
+        insver=$(echo "$scan" | cut -d ";" -f2)
+        if [[ $insver == 6.0.* ]]; then
+            printresult $2 "$insver" "$loc"
+        fi
+    done
+}
+
+function typo3_61 {
+    t3Scans="$(typo3_scan $1)"
+    for scan in ${t3Scans}; do
+        loc=$(echo "$scan" | cut -d ";" -f1)
+        insver=$(echo "$scan" | cut -d ";" -f2)
+        if [[ $insver == 6.1.* ]]; then
+            printresult $2 "$insver" "$loc"
+        fi
+    done
+}
+
+function typo3_62 {
+    t3Scans="$(typo3_scan $1)"
+    for scan in ${t3Scans}; do
+        loc=$(echo "$scan" | cut -d ";" -f1)
+        insver=$(echo "$scan" | cut -d ";" -f2)
+        if [[ $insver == 6.2.* ]]; then
             printresult $2 "$insver" "$loc"
         fi
     done
