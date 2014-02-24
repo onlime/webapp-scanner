@@ -66,10 +66,9 @@ function getcoredomains {
 #
 # vercomp VERSION1 VERSION2
 #
-# returns
-# 0: VERSION1 equals VERSION2
-# 1: VERSION1 is greater than VERSION2
-# 2: VERSION1 is lower than VERSION2
+# Returns 0 if VERSION1 is equals VERSION2.
+# Returns 1 if VERSION1 is greater than VERSION2.
+# Returns 2 if VERSION1 is lower than VERSION2.
 function vercomp {
     if [[ $1 == $2 ]]; then
         return 0
@@ -95,6 +94,21 @@ function vercomp {
     return 0
 }
 
+# Compares two version strings.
+#
+# Returns 0 if program version is equal or greater than check version.
+# Returns 1 if program version is lower than check version.
+#
+# TODO: currently, this is no replacement for the above vercomp function as
+# some systems (e.g. OSX 10.9) still use a very outdated version of GNU sort 
+# without -V, --version-sort support.
+#version_compare() {
+#    local version=$1 check=$2
+#    local winner=$(echo -e "$version\n$check" | sed '/^$/d' | sort -Vr | head -1)
+#    [[ "$winner" = "$version" ]] && return 0
+#    return 1
+#}
+
 # Checks the version status in comparison to the minimal
 # required version and the current version.
 #
@@ -105,10 +119,11 @@ function vercomp {
 # 1: WARNING (version is greater than minimal version but not >= current version)
 # 2: CRITICAL (version is lower than minimal version)
 function verstatus {
-    vercomp $1 $3;
-    if [[ $? == 2 ]]; then
-        vercomp $1 $2
-        if [[ $? == 2 ]]; then
+    local version=$1 minver=$2 curver=$3
+    vercomp $version $curver;
+    if [[ $? -eq 2 ]]; then
+        vercomp $version $minver
+        if [[ $? -eq 2 ]]; then
             # CRITICAL
             return 2
         else
@@ -294,9 +309,9 @@ function printresult {
     if [[ ! $csvformat ]]; then
         if [[ ! $reportonly ]]; then
             vercomp $2 $curver;
-            if [[ $? == 2 ]]; then
+            if [[ $? -eq 2 ]]; then
                 vercomp $2 $minver
-                if [ $? == 2 ]; then
+                if [ $? -eq 2 ]; then
                     echo -e "$program\e[0;31m$insver\e[0m$curver$3"
                 else
                     echo -e "$program\e[0;33m$insver\e[0m$curver$3"
@@ -308,7 +323,7 @@ function printresult {
             fi
         else
             vercomp $2 $curver
-            if [[ $? == 2 ]]; then
+            if [[ $? -eq 2 ]]; then
                 echo -e "$program$insver$curver$3"
             else
                 if [[ ! $showonlyold ]]; then
@@ -318,7 +333,7 @@ function printresult {
         fi
     else
         vercomp $2 $curver
-        if [[ $? == 2 ]]; then
+        if [[ $? -eq 2 ]]; then
             echo "$program,$insver,$curver,$status,$3"
         else
             if [[ ! $showonlyold ]]; then
