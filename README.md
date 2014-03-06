@@ -2,6 +2,10 @@
 
 A webapplication scanner that detects all outdated webapps on a server.
 
+## Credits
+
+This project was forked from [VersionFinder by James Dooley](http://g33kinfo.com/info/archives/5981). All credits go to James.
+
 ## Purpose
 
 This script scans the user directories and reports the installed CMS packages and what version it is running. It can be set to report just outdated packages and scan specific users. It has the ability to search for common versions of the following packages:
@@ -29,7 +33,7 @@ Additional packages can be added by adding a function with the signature to iden
 sample installation:
 
 ```bash
-$ cd /usr/src/
+$ cd /opt/
 $ git clone https://github.com/onlime/webapp-scanner.git webapp-scanner
 $ cd webapp-scanner
 $ chmod +x webapp-scanner.sh
@@ -38,28 +42,34 @@ $ ./webapp-scanner.sh
 
 That's it. If you wish to scan all your customers homes, make sure you run this as root. It won't alter any files on your system, simply scan it.
 
+For more convenience, add the following alias to your ```~/.bashrc``` or globally to ```/etc/profile```:
+
+```bash
+alias webappscanner='/opt/webapp-scanner/webapp-scanner.sh'
+```
+
 ## Usage
 
 ```bash
-webapp-scanner.sh
+webappscanner
 ```
 Default with no flags will scan all users and report all matches.
 Versions will be colorized based on how old they are, but on a large server this list can be huge.
 
 ```bash
-webapp-scanner.sh --outdated
+webappscanner --outdated
 ```
 Limits the list to outdated installs, generally more useful.
 
 ```bash
-webapp-scanner.sh --user user1
+webappscanner --user user1
 ```
 Limits the scan to a specific user or list of users, should be space separated list surrounded by quotes. ie "user1 user2 user3".
 Quotes are not required if you only want to scan a single user.
 You can now use this with core managed setups, any user added here will check against the passwd file and scan their entire homedir.
 
 ```bash
-webapp-scanner.sh --directory /var/www/some/dir
+webappscanner --directory /var/www/some/dir
 ```
 Limits the scan to a specific directory or list of directories, should be space separated list surrounded by quotes. ie "/home/user1 /home/user2 /home/user3".
 Quotes are not required if you only want to scan a single directory.
@@ -67,30 +77,30 @@ Not sure about spaces in directory names.
 Although /home/* will work, due to bash expansion the counter will be broken during the scan (will show 2/1 or whatnot).
 
 ```bash
-webapp-scanner.sh --report > report.txt
+webappscanner --report > report.txt
 ```
 Drops the bash coloring so you can export to a text file, otherwise you need to cat the file so that bash will strip the color codes.
 
 ```bash
-webapp-scanner.sh --csv
+webappscanner --csv
 ```
 Exports to a CSV file, should work most of the time.
 
 ```bash
-webapp-scanner.sh --sigs
+webappscanner --sigs
 ```
 This will return the current signatures and the version information.
 Good way of checking what version it is expecting to find.
 
 ```bash
-webapp-scanner.sh --help
+webappscanner --help
 ```
 If all else fails, this prints out the help message so you can get the basic usage.
 
 Also you can combine most flags together, e.g.:
 
 ```bash
-webapp-scanner.sh --outdated --user user1 --report > outdated.txt
+webappscanner --outdated --user user1 --report > outdated.txt
 ```
 
 ## Questions
