@@ -103,6 +103,50 @@ Also you can combine most flags together, e.g.:
 webappscanner --outdated --user user1 --report > outdated.txt
 ```
 
+## Output
+
+####default output (colorized)
+
+sample output:
+
+```
+# webappscanner --directory /var/www/
+Typo3_4.5	4.5.25		4.5.32		/var/www/web123/public_html/www/
+Typo3_4.5	4.5.30		4.5.32		/var/www/web345/public_html/www/
+Typo3_4.7	4.7.17		4.7.17		/var/www/web678/public_html/www/
+Joomla_1.5	1.5.15		1.5.999		/var/www/web111/public_html/old/
+Joomla_1.5	1.5.26		1.5.999		/var/www/web222/public_html/www/
+Joomla_3.2	3.1.5		3.2.2		/var/www/web101/public_html/www/
+Joomla_3.2	3.0.3		3.2.2		/var/www/web202/public_html/www/
+Joomla_3.2	3.2.2		3.2.2		/var/www/web303/public_html/relaunch/
+WordPress	3.8		3.8.1		/var/www/web110/public_html/www/
+WordPress	3.8.1		3.8.1		/var/www/web120/public_html/www/
+```
+
+####csv output
+
+In addition to the default output, we will get an additional version status code:
+
+- 0: OK (version equals or is greater than current version)
+- 1: WARNING (version is greater than minimal version but not >= current version)
+- 2: CRITICAL (version is lower than minimal version)
+
+sample output:
+
+```
+# webappscanner --directory /var/www/ --csv
+Typo3_4.5,4.5.25,4.5.32,1,/var/www/web123/public_html/www/
+Typo3_4.5,4.5.30,4.5.32,1,/var/www/web345/public_html/www/
+Typo3_4.7,4.7.17,4.7.17,0,/var/www/web678/public_html/www/
+Joomla_1.5,1.5.15,1.5.999,1,/var/www/web111/public_html/old/
+Joomla_1.5,1.5.26,1.5.999,1,/var/www/web222/public_html/www/
+Joomla_3.2,3.1.5,3.2.2,2,/var/www/web101/public_html/www/
+Joomla_3.2,3.0.3,3.2.2,2,/var/www/web202/public_html/www/
+Joomla_3.2,3.2.2,3.2.2,0,/var/www/web303/public_html/relaunch/
+WordPress,3.8,3.8.1,1,/var/www/web110/public_html/www/
+WordPress,3.8.1,3.8.1,0,/var/www/web120/public_html/www/
+```
+
 ## Questions
 
 ### CMS Not Found
