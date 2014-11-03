@@ -9,36 +9,36 @@
 #
 
 # Signature scanning configuration (This should not need to be updated)
-# Format is function;Display_Name;Minimum_Version;Current_Version
+# Format is function;Display_Name;Minimum_Version;Current_Version;Vendor_Url
 # Do note that there can not be spaces in the ID strings.
 scans=""
-scans="$scans typo3_45;Typo3_4.5;4.5;4.5.30"
-scans="$scans typo3_47;Typo3_4.7;4.7;4.7.17"
-scans="$scans typo3_60;Typo3_6.0;6.0;6.0.12"
-scans="$scans typo3_61;Typo3_6.1;6.1;6.1.7"
-scans="$scans typo3_62;Typo3_6.2;6.2;6.2.0"
-scans="$scans drupal7;Drupal7;7;7.26"
-scans="$scans drupal6;Drupal6;6;6.30"
+scans="$scans typo3_45;Typo3;4.5;4.5.34"
+scans="$scans typo3_47;Typo3;4.7;4.7.19"
+scans="$scans typo3_60;Typo3;6.0;6.2.6"
+scans="$scans typo3_61;Typo3;6.1;6.1.12"
+scans="$scans typo3_62;Typo3;6.2;6.2.6"
+scans="$scans drupal7;Drupal;7;7.32"
+scans="$scans drupal6;Drupal;6;6.33"
 # e107 2.0.0 is alpha not adding until released
 scans="$scans e107;e107;1;1.0.4"
-scans="$scans joomla15;Joomla_1.5;1.5;1.5.999"     # EOL; No longer offered on site
-scans="$scans joomla17;Joomla_1.7;1.7.999;1.7.999" # EOL; No longer offered on site
-scans="$scans joomla25;Joomla_2.5;2.5;2.5.18"
-scans="$scans joomla32;Joomla_3.2;3.2;3.2.2"
-scans="$scans mambo;Mambo_CMS;4.6;4.6.5"
-scans="$scans mediawiki;MediaWiki;1.22;1.22.2"
+scans="$scans joomla15;Joomla;1.5;1.5.999"     # EOL; No longer offered on site
+scans="$scans joomla17;Joomla;1.7.999;1.7.999" # EOL; No longer offered on site
+scans="$scans joomla25;Joomla;2.5;2.5.27"
+scans="$scans joomla32;Joomla;3.2;3.3.6"
+scans="$scans joomla33;Joomla;3.3;3.3.6"
+scans="$scans mambo;MamboCMS;4.6;4.6.5"
+scans="$scans mediawiki;MediaWiki;1.23;1.23.5"
 scans="$scans openx;OpenX/Revive;3.0;3.0.2"
-scans="$scans oscommerce2;osCommerce2;2.3;2.3.3.4"
-scans="$scans phpbb3;phpBB3;3.0;3.0.12"
-scans="$scans piwigo;Piwigo;2.6;2.6.1"
-scans="$scans redmine2_3;Redmine_2.3;2.3;2.3.4"
-scans="$scans redmine2_4;Redmine_2.4;2.4;2.4.3"
+scans="$scans oscommerce2;osCommerce;2.3;2.3.4"
+scans="$scans phpbb3;phpBB;3.1;3.1.1"
+scans="$scans piwigo;Piwigo;2.7;2.7.1"
+scans="$scans redmine;Redmine;2.5;2.5.3"
 # vBull has 3.8 and 5.0 lines, due to closed source I am not able to create signatures
-scans="$scans vbulletin4;vBulletin_4;4.2;4.2.2"
-scans="$scans wordpress;WordPress;3.8;3.8.1"
+scans="$scans vbulletin4;vBulletin;4.2;4.2.2"
+scans="$scans wordpress;WordPress;4.0;4.0"
 scans="$scans xcart;X-Cart;5.0;5.0.11"
 scans="$scans xoops;XOOPS;2.5;2.5.6"
-scans="$scans zencart;ZenCart;1.5;1.5.1"
+scans="$scans zencart;ZenCart;1.5;1.5.3"
 
 
 function getcpanelusers {
@@ -497,7 +497,21 @@ function joomla32 {
     for loc in ${idfiles}; do
         if [[ ! -e $loc/includes/version.php ]]; then
             if [[ -e $loc/libraries/cms/version/version.php ]]; then
-                if [[ $(grep "RELEASE =" $loc/libraries/cms/version/version.php | cut -d "'" -f2 | grep "^3") ]]; then
+                if [[ $(grep "RELEASE =" $loc/libraries/cms/version/version.php | cut -d "'" -f2 | grep "^3.2") ]]; then
+                    insver=$(grep "RELEASE =" $loc/libraries/cms/version/version.php | cut -d "'" -f2)"."$(grep "DEV_LEVEL =" $loc/libraries/cms/version/version.php | cut -d "'" -f2)
+                    printresult $2 "$insver" "$loc"
+                fi
+            fi
+        fi
+    done
+}
+
+function joomla33 {
+    idfiles=$(find  $1 -name web.config.txt | sed 's:[^/]*$::')
+    for loc in ${idfiles}; do
+        if [[ ! -e $loc/includes/version.php ]]; then
+            if [[ -e $loc/libraries/cms/version/version.php ]]; then
+                if [[ $(grep "RELEASE =" $loc/libraries/cms/version/version.php | cut -d "'" -f2 | grep "^3.3") ]]; then
                     insver=$(grep "RELEASE =" $loc/libraries/cms/version/version.php | cut -d "'" -f2)"."$(grep "DEV_LEVEL =" $loc/libraries/cms/version/version.php | cut -d "'" -f2)
                     printresult $2 "$insver" "$loc"
                 fi
@@ -589,21 +603,7 @@ function openx {
     done
 }
 
-function redmine2_3 {
-    idfiles=$(find $1 -name redmine.rb | xargs grep -l "redmine" | sed "s|lib/redmine.rb||")
-    for loc in ${idfiles}; do
-        if [[ -e $loc/doc/CHANGELOG ]]; then
-            insver=$(grep "==" $loc/doc/CHANGELOG | head -2 | tail -1 | cut -d "v" -f2)
-            majver=$(echo "$insver" | cut -d . -f1,2)
-            scanmaj=$(echo "$2" | cut -d ';' -f3)
-            if [ ! $majver \> $scanmaj ]; then
-                printresult $2 "$insver" "$loc"
-            fi
-        fi
-    done
-}
-
-function redmine2_4 {
+function redmine {
     idfiles=$(find $1 -name redmine.rb | xargs grep -l "redmine" | sed "s|lib/redmine.rb||")
     for loc in ${idfiles}; do
         if [[ -e $loc/doc/CHANGELOG ]]; then
@@ -616,7 +616,6 @@ function redmine2_4 {
         fi
     done
 }
-
 
 function drupal7 {
     idfiles=$(find  $1 -name authorize.php | xargs grep -l "Drupal" | sed 's:[^/]*$::')
