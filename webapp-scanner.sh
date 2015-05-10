@@ -35,7 +35,7 @@ scans="$scans piwigo;Piwigo;2.7;2.7.1"
 scans="$scans redmine;Redmine;2.5;2.5.3"
 # vBull has 3.8 and 5.0 lines, due to closed source I am not able to create signatures
 scans="$scans vbulletin4;vBulletin;4.2;4.2.2"
-scans="$scans wordpress;WordPress;4.0;4.1.1"
+scans="$scans wordpress;WordPress;4.0;4.2.2"
 scans="$scans xcart;X-Cart;5.0;5.0.11"
 scans="$scans xoops;XOOPS;2.5;2.5.6"
 scans="$scans zencart;ZenCart;1.5;1.5.3"
