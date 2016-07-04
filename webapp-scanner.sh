@@ -1,6 +1,6 @@
 #!/bin/bash
 # 
-# Webapp Scanner by Onlime Webhosting, http://www.onlime.ch
+# Webapp Scanner by Onlime Webhosting, https://www.onlime.ch
 # Locates common web programs on a server and checks the version to see if it is up to date
 #
 # based on / credits to:
@@ -8,38 +8,38 @@
 # http://g33kinfo.com/info/archives/5981
 #
 
-# Signature scanning configuration (This should not need to be updated)
+# Signature scanning configuration
 # Format is function;Display_Name;Minimum_Version;Current_Version;Vendor_Url
 # Do note that there can not be spaces in the ID strings.
 scans=""
 scans="$scans typo3_45;Typo3;4.5;4.5.40"
 scans="$scans typo3_47;Typo3;4.7;4.7.20"
-scans="$scans typo3_60;Typo3;6.0;6.2.12"
-scans="$scans typo3_61;Typo3;6.1;6.2.12"
-scans="$scans typo3_62;Typo3;6.2;6.2.12"
-scans="$scans drupal7;Drupal;7;7.37"
-scans="$scans drupal6;Drupal;6;6.33"
+scans="$scans typo3_60;Typo3;6.0;6.2.25"
+scans="$scans typo3_61;Typo3;6.1;6.2.25"
+scans="$scans typo3_62;Typo3;6.2;6.2.25"
+scans="$scans drupal7;Drupal;7;7.44"
+scans="$scans drupal6;Drupal;6;6.38"
 # e107 2.0.0 is alpha not adding until released
 scans="$scans e107;e107;1;1.0.4"
 scans="$scans joomla15;Joomla;1.5;1.5.999"     # EOL; No longer offered on site
 scans="$scans joomla17;Joomla;1.7.999;1.7.999" # EOL; No longer offered on site
 scans="$scans joomla25;Joomla;2.5;2.5.27"
-scans="$scans joomla32;Joomla;3.2;3.4.1"
-scans="$scans joomla33;Joomla;3.3;3.4.1"
-scans="$scans joomla34;Joomla;3.4;3.4.1"
+scans="$scans joomla32;Joomla;3.2;3.5.1"
+scans="$scans joomla33;Joomla;3.3;3.5.1"
+scans="$scans joomla34;Joomla;3.4;3.5.1"
 scans="$scans mambo;MamboCMS;4.6;4.6.5"
 scans="$scans mediawiki;MediaWiki;1.24;1.25.1"
 scans="$scans openx;OpenX/Revive;3.0;3.0.2"
 scans="$scans oscommerce2;osCommerce;2.3;2.3.4"
-scans="$scans phpbb3;phpBB;3.1;3.1.4"
+scans="$scans phpbb3;phpBB;3.1;3.1.9"
 scans="$scans piwigo;Piwigo;2.7;2.7.1"
 scans="$scans redmine;Redmine;2.5;2.5.3"
 # vBull has 3.8 and 5.0 lines, due to closed source I am not able to create signatures
 scans="$scans vbulletin4;vBulletin;4.2;4.2.2"
-scans="$scans wordpress;WordPress;4.0;4.2.2"
+scans="$scans wordpress;WordPress;4.0;4.5.3"
 scans="$scans xcart;X-Cart;5.0;5.0.11"
 scans="$scans xoops;XOOPS;2.5;2.5.6"
-scans="$scans zencart;ZenCart;1.5;1.5.3"
+scans="$scans zencart;ZenCart;1.5;1.5.5"
 
 
 function getcpanelusers {
